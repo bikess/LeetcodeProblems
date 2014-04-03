@@ -42,18 +42,15 @@ public class LastFindTree {
 		ArrayList<Integer> list = new ArrayList<Integer>();
 		Stack<TreeNode> stack = new Stack<TreeNode>();
 		if(root == null) return list;
-		stack.push(root);
-		while(!stack.isEmpty()){
-//			若节点的左孩子为空，则输出
-			TreeNode node = stack.peek();
-			if(node.left!=null){
-				stack.push(node.left);
+		TreeNode p = root;
+		while(p!=null||!stack.isEmpty()){
+			if(p!=null){
+				stack.push(p);
+				p= p .left;
 			}else{
-				TreeNode p  = stack.pop();
+				p = stack.pop();
 				list.add(p.val);
-				if(node.right!=null){
-					stack.push(node.right);
-				}
+				p = p.right;
 			}
 		}
 		return list;
