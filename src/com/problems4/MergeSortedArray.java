@@ -1,4 +1,4 @@
-package com.problem4;
+package com.problems4;
 
 /****
  * Given two sorted integer arrays A and B, merge B into A as one sorted array.

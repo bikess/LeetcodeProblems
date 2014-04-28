@@ -1,4 +1,6 @@
-package com.problem4;
+package com.problems4;
+
+import java.util.Arrays;
 
 public class RemoveDuplicates {
 
@@ -29,12 +31,16 @@ public class RemoveDuplicates {
 			 }
 		 }
 		 A[newLen++] = key;
-		return len;
-	        
+//		 Arrays.sort(A);
+		 int a =5;
+		 String s = String.valueOf(a);
+		return len;    
 	}
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-
+		char a[] = {'a','b','c'};
+		System.out.println(Arrays.toString(a));
+		System.out.println(String.valueOf(a));
 	}
 
 }

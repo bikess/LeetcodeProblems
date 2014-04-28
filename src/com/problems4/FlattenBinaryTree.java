@@ -1,4 +1,4 @@
-package com.problem4;
+package com.problems4;
 
 import java.util.Stack;
 

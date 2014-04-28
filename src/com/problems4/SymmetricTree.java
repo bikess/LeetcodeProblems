@@ -1,4 +1,4 @@
-package com.problem4;
+package com.problems4;
 
 public class SymmetricTree {
 
