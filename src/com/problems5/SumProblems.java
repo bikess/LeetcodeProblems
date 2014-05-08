@@ -336,6 +336,7 @@ public class SumProblems {
     				continue;
     			}
     			int sum = num[i]+num[left]+num[right];
+//    			第一次得到的sum值，作为最初的closet值
     			if(first==true){
     				closet = sum;
     				first = false;
@@ -345,9 +346,12 @@ public class SumProblems {
     					closet = sum;
     				}
     			}
+//    			若此时的最贴近值等于目标值，直接返回此数
     			if(closet==target){
     				return closet;
-    			}else if(closet>target){
+    			}
+//    			还是与就twosum一样，比目标值大，右指针--，比目标值小，左指针++
+    			if(sum>target){
     				right--;
     			}else{
     				left++;
