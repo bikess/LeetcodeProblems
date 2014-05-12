@@ -1,4 +1,4 @@
-package com.ReverseWords;
+package com.problems1;
 
 public class ReverseWords {
 

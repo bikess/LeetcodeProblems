@@ -1,9 +1,11 @@
 package com.problems4;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /***
  * 求解全排列
+ * 此题目中不存在重复的元素
  * @author bike
  *
  */
@@ -103,5 +105,90 @@ public class Permutations {
 		ArrayList<ArrayList<Integer>> list = m.permute(num);
 		System.out.println(list.toString());
 	}
-
+	/***
+	 * 
+	 * 扩展题目，若输入的数组中存在重复的元素，要求输出所有的全排列，而且不能有重复
+	 */
+	/***
+	 * 思路1 ：此思路还是用重复的
+	 * @param num
+	 * @return
+	 */
+    public ArrayList<ArrayList<Integer>> permuteUnique(int[] num) {
+    	ArrayList<ArrayList<Integer>> result = new ArrayList<>();
+//    	int len = num.length;
+    	if(num.length<=0){
+    		return result;
+    	}
+    	Arrays.sort(num);
+    	ArrayList<Integer> list = new ArrayList<>();
+    	getPermute(result,list,0,num);
+		return result;
+        
+    }
+	private void getPermute(ArrayList<ArrayList<Integer>> result,
+			ArrayList<Integer> list, int index, int[] num) {
+		// TODO Auto-generated method stub
+		if(index == num.length){
+			result.add((ArrayList<Integer>)list.clone());
+			return ;
+		}
+		for(int i = index;i<num.length;i++){
+			
+			if(i==index||num[i]!=num[index])
+			{
+				int temp  = num[index];
+				num[i] = num[index];
+				num[index] = temp;
+				list.add(num[index]);
+				getPermute(result, list, index+1, num);
+				temp = num[index];
+				num[index] = num[i];
+				num[i] = temp;
+				list.remove(list.size()-1);
+			}
+			
+		}
+	}
+	/***！！！！！！！！！！！ 推荐用这个方法！！！！！！！！！！！！！！！！！！！！
+	 *  思路2 ：此方法无论数组中是否含有重复的元素，都是可用的，而且不用对数组元素进行频繁的交换，只是额外使用一个boolean数组表示前一个元素是否适用过！
+	 * （1） 首先对数组进行排序，让重复的元素相邻在一起
+	 * （2） 开辟一个boolean 数组表示当前的元素是否被使用过，
+	 *  方法当当前元素与i-1的元素相等的时候，若i-1个元素已经被使用过了，就跳出当前的递归
+	 */
+    public ArrayList<ArrayList<Integer>> permuteUnique2(int[] num) {
+    	ArrayList<ArrayList<Integer>> result = new ArrayList<>();
+//    	int len = num.length;
+    	if(num.length<=0){
+    		return result;
+    	}
+    	Arrays.sort(num);
+    	ArrayList<Integer> list = new ArrayList<>();
+//    	定义一个数组用来标示当前元素是否被用过了
+    	boolean used[] = new boolean[num.length];
+    	getPermute2(result,list,used,num);
+		return result;
+        
+    }
+	private void getPermute2(ArrayList<ArrayList<Integer>> result,
+			ArrayList<Integer> list, boolean[] used, int[] num) {
+		// TODO Auto-generated method stub
+		if(list.size()==num.length){
+			result.add(new ArrayList<>(list));
+			return;
+		}
+		for(int i = 0;i<num.length;i++){
+//			判断当前的元素与前一个元素是否相等且前一个元素是否已经使用过了
+			if(i>0&&used[i-1]&&num[i]==num[i-1])
+				continue;
+			if(!used[i]){
+				used[i] = true;
+				list.add(num[i]);
+				getPermute2(result, list, used, num);
+				list.remove(list.size()-1);
+				used[i] = false;
+			}
+		}
+	}
+	
 }

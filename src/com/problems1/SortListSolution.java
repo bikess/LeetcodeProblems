@@ -1,4 +1,4 @@
-package com.sortList;
+package com.problems1;
 /*
  * Sort a linked list in O(n log n) time using constant space complexity.
  * 在固定的空间复杂度的情况下要求对一个链表在0（n*lgn)时间复杂度内进行排序
