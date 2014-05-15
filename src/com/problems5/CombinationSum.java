@@ -94,5 +94,45 @@ public class CombinationSum {
 		int candidates [] = {1};
 		System.out.println(cs.combinationSum(candidates, 1).toString());
 	}
-
+	/***
+	 * 
+	 * 题目扩展：
+	 * 题目大意：
+	 * 给一个数组和一个目标值，从数组中找出一个数字组合，其和为目标值，找出所有的这样的组合。并且数组中的每一个元素在一个组合中只能被使用一次！！！
+	 * （1）所有的数字为正数
+	 * （2）在组合中的每一个元素必须非降序排列
+	 * （3）组合中不能包含重复的解
+	 */
+	
+	public ArrayList<ArrayList<Integer>> combinationSum2(int[] num, int target) {
+		int len = num.length;
+		ArrayList<ArrayList<Integer>> result = new ArrayList<>();
+		if(len<=0){
+			return result;
+		}
+		ArrayList<Integer> list = new ArrayList<>();
+		Arrays.sort(num);
+		DFS(num,target,0,list,result);
+		return result;
+		
+	}
+	private void DFS(int[] num, int target, int start, ArrayList<Integer> list,
+			ArrayList<ArrayList<Integer>> result) {
+		// TODO Auto-generated method stub
+		if(target==0){
+			result.add(new ArrayList<>(list));
+			return;
+		}
+		for(int i = start;i<num.length;i++){
+//			去除重复的组合
+			if(i>start&&num[i]==num[i-1])
+				continue;
+			if(target-num[i]<0){
+				return;
+			}
+			list.add(num[i]);
+			DFS(num, target-num[i], i+1, list, result);
+			list.remove(list.size()-1);
+		}
+	}
 }
