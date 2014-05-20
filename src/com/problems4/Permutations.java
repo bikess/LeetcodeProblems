@@ -122,34 +122,34 @@ public class Permutations {
     	}
     	Arrays.sort(num);
     	ArrayList<Integer> list = new ArrayList<>();
-    	getPermute(result,list,0,num);
+//    	getPermute(result,list,0,num);
 		return result;
         
     }
-	private void getPermute(ArrayList<ArrayList<Integer>> result,
-			ArrayList<Integer> list, int index, int[] num) {
-		// TODO Auto-generated method stub
-		if(index == num.length){
-			result.add((ArrayList<Integer>)list.clone());
-			return ;
-		}
-		for(int i = index;i<num.length;i++){
-			
-			if(i==index||num[i]!=num[index])
-			{
-				int temp  = num[index];
-				num[i] = num[index];
-				num[index] = temp;
-				list.add(num[index]);
-				getPermute(result, list, index+1, num);
-				temp = num[index];
-				num[index] = num[i];
-				num[i] = temp;
-				list.remove(list.size()-1);
-			}
-			
-		}
-	}
+//	private void getPermute(ArrayList<ArrayList<Integer>> result,
+//			ArrayList<Integer> list, int index, int[] num) {
+//		// TODO Auto-generated method stub
+//		if(index == num.length){
+//			result.add((ArrayList<Integer>)list.clone());
+//			return ;
+//		}
+//		for(int i = index;i<num.length;i++){
+//			
+//			if(i==index||num[i]!=num[index])
+//			{
+//				int temp  = num[index];
+//				num[i] = num[index];
+//				num[index] = temp;
+//				list.add(num[index]);
+//				getPermute(result, list, index+1, num);
+//				temp = num[index];
+//				num[index] = num[i];
+//				num[i] = temp;
+//				list.remove(list.size()-1);
+//			}
+//			
+//		}
+//	}
 	/***！！！！！！！！！！！ 推荐用这个方法！！！！！！！！！！！！！！！！！！！！
 	 *  思路2 ：此方法无论数组中是否含有重复的元素，都是可用的，而且不用对数组元素进行频繁的交换，只是额外使用一个boolean数组表示前一个元素是否适用过！
 	 * （1） 首先对数组进行排序，让重复的元素相邻在一起

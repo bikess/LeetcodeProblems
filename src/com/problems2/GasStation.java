@@ -38,6 +38,32 @@ public class GasStation {
 	/**
 	 * @param args
 	 */
+	/**
+	 * 方法2:
+	 * (1)如果所有站的代价和大于等于0，则所求的路线必定存在。如果总代价〉=0,从序号0开始求代价和，如果代价和小于0，
+	 * 则不是从本站或者本站之前的某一个代价大于0的站开始，必从下一站即之后的站开始，而且这样的站必定存在O（n）
+	 * @param args
+	 */
+	public int canCompleteCircuit2(int[] gas, int[] cost) {
+		int len = gas.length;
+		int sum = 0;
+		int total = 0;
+		int start = 0;
+		for(int i=0;i<len;i++){
+			sum = sum+gas[i]-cost[i];
+			total = total + gas[i]-cost[i];
+			if(sum<0){
+				start = (i+1)%len;
+				sum=0;
+			}
+		}
+		if(total>=0){
+			return start;
+		}
+		else{
+			return -1;
+		}
+	}
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		
