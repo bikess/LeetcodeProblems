@@ -1,4 +1,9 @@
 package com.partition;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.PriorityQueue;
+
 /***
  * 此类包含了所有leetcode上关于链表的所有问题的解法，以后不但leetcode上的关于链表的问题，
  * 其他任何的关于链表的问题都可以写在这个包中
@@ -33,7 +38,7 @@ public class List {
 			end = end.next;
 		}
 //		归并递归的两个参数分别是头节点与尾节点
-		System.out.println(end.val);
+//		System.out.println(end.val);
 		ListNode newHead = GuiBingSortList(head,end);
 		return newHead;
 		
@@ -92,11 +97,106 @@ public class List {
 		pre.next = pre1==null? pre2:pre1;
 		return head;
 	}
+	/***
+	 * 
+	 * （以后在写归并算法的时候还是尽量利用上面的方法，以最后一个节点作为end进行归并，这样比较不容易出错！！！）
+	 * 归并排序的另一种写法,之所以是另一种写法是因为，归并排序的末尾值是null,而不是利用指针遍历，找到的链表的真正的尾部节点，而是尾部节点的下一个节点，null
+	 * @param args
+	 */
+	public ListNode SortList2(ListNode head){
+		if(head==null&&head.next==null)
+			return head;
+//			 否则进行递归归并排序，递归的第一个节点与最后一个节点下一个节点，因此归并链表的时候不包括end节点
+		return guibingSort(head,null);
+	}
+	private ListNode guibingSort(ListNode start, ListNode end) {
+		// TODO Auto-generated method stub
+//		这句判断，可有可无
+//		if(start==null)
+//			return null;
+//		这里start.next==end，保证此时该归并的链表只有一个节点，则直接返回！！，该语句已经包括了start为null的情况了
+		if(start.next==end)
+//			这里一定要注意，将start.next 置为null否则会出现某个指针next不为null
+		{   start.next=null;
+			return start;
+		}
+		//设置快慢指针确定链表的中间节点
+		ListNode slow = start;
+		ListNode fast = start;
+//		这里一定注意判断条件
+		while(fast!=end&&fast.next!=end){
+			slow = slow.next;
+			fast = fast.next.next;
+		}
+//		此时slow节点要么在正中的节点，要么在中间偏右的节点
+//		左链表归并我们不不含slow节点，右链表归并包含slow节点
+		ListNode l1 = guibingSort(start, slow);
+		ListNode l2 = guibingSort(slow, end);
+		return merge(l1,l2);
+	}
+//	这种递归的方式,合并两个链表固然简单,但是容易出现栈溢出,我们最好还是不用递归
+	private ListNode merge(ListNode l1, ListNode l2) {
+		// TODO Auto-generated method stub
+		if(l1==null)
+			return l2;
+		if(l2==null)
+			return l1;
+		ListNode result = null;
+		if(l1.val<=l2.val){
+			result = l1;
+			result.next = merge(l1.next, l2);
+		}else{
+			result = l2;
+			result.next = merge(l1, l2.next);
+		}
+		return result;
+	}
+	private ListNode merge2(ListNode l1,ListNode l2){
+		if(l1==null)
+			return l2;
+		if(l2==null)
+			return l1;
+		ListNode cur1 = l1,cur2 = l2;
+//		下面对两个链表进行归并
+//		设置合并链表的表头
+		ListNode head = null;
+		if(cur1.val<=cur2.val)
+		{
+			head = cur1;
+			cur1 = cur1.next;
+		}else{
+			head = cur2;
+			cur2 = cur2.next;
+		}
+		ListNode pre = head;
+		while(cur1!=null&&cur2!=null){
+			if(cur1.val<=cur2.val){
+				pre.next = cur1;
+				cur1= cur1.next;
+			}else{
+				pre.next = cur2;
+				cur2 = cur2.next;
+			}
+			pre = pre.next;
+		}
+		pre.next = cur1==null? cur2:cur1;
+		return head;
+	}
 	public static void main(String [] args){
 		List l = new List();
-		ListNode head = new ListNode(2);
-		head.next= new ListNode(1);
-		l.SortList(head);
+		ListNode head = new ListNode(6);
+		ListNode data1 = new ListNode(5);
+		head.next = data1;
+		ListNode data2 =new ListNode(4);
+		data1.next = data2;
+		data2.next = new ListNode(3);
+//		l.SortList(head);
+		ListNode newHead = l.SortList2(head);
+		ListNode pre = newHead;
+		while(pre!=null){	
+			System.out.print(pre.val+"\t");
+			pre = pre.next;
+		}
 	}
 	
 	/***！！！！！问题2--------------------插入排序链表---------------------！！！！！！！！！！
@@ -489,20 +589,345 @@ public class List {
 		return newhead.next;
 	}
 	
+	/***！！！！！问题10--------------------Partition List 给定一个单项链表与一个值x，划分这个链表使得所有比x小的node都在所有比x大的node的前面。同时注意保持节点原有的相对位置关系---------------------！！
+	 * 关键思路：（1）设置双指针，注意保存指针的前驱节点的重要性  （2）设置一个永远指向头部的节点newHead，并且遍历的时候利用 cur = newHead，
+	 * 并利用cur.next进行链表的遍历扫描，与指针的指向调整，可以很好的减少头指针的考虑，最后返回newHead.next来返回新的链表
+	 * 
+	 * 输入：链表head和一个值x，输出链表head
+	 * 思路：维护两个指针，一个指针是指向在x元素的节点前面的比x元素小的链表的末尾
+	 * 一个指针 指向当前的指针进行判断
+	 */
+	public ListNode partitionList(ListNode head,int x){
+		if(head==null){
+			return null;
+		}
+		ListNode newHead = new ListNode(0);
+		newHead.next = head;
+//		设置指向比x元素小的指针的尾部的元素,注意这里tail指向最后一个比x小的元素
+		ListNode tail = newHead;
+//		保存其前驱指针
+		ListNode pre = newHead;
+//		设置扫描指针
+		ListNode cur = head;
+		while(cur!=null){
+			if(cur.val>=x){
+				pre = cur;
+				cur = cur.next;
+			}else{
+//				注意若pre等于cur表明此前所有的元素一直是小于x的，此时将指针依次向后移动就可以了
+				if(pre==tail){
+					tail = cur;
+					pre = cur;
+					cur = cur.next;
+					continue;
+				}
+				pre.next = cur.next;
+				cur.next = tail.next;
+				tail.next = cur;
+				tail = cur;
+				cur = pre.next;
+			}
+		}
+		
+		return newHead.next;
+		
+	}
+	
+	/***！！！！！问题10--------------------去除有序链表中的数字重复的节点，要求每一个重复的数字保留1个节点---------------------！！
+	 * 
+	 * 输入 :链表 head  输出：去除重复后的节点的链表head
+	 */
+	
+	public ListNode deleteDuplicates(ListNode head){
+		if(head==null||head.next==null){
+			return head;
+		}
+//		设置指针cur,用cur.next进行循环
+		ListNode cur = head;
+		while(cur!=null&&cur.next!=null){
+//			若当前两个节点值重复，删除节点，cur指向不变
+			if(cur.val==cur.next.val){
+				cur.next = cur.next.next;
+//				复杂cur指向下一个节点
+			}else{
+				cur = cur.next;
+			}
+		}
+		return head;
+		
+	}
+	
+	/***！！！！！问题11--------------------去除有序链表中的数字重复的节点，要求只要是重复节点全部删除，不保留任何一个---------------------！！
+	 * 
+	 * 
+	 * 输入：链表head  输出：去除所有重复后的节点的链表head
+	 */
+	public ListNode deleteDuplicates2(ListNode head){
+		if(head==null||head.next==null){
+			return head;
+		}
+//		由于可能会删除头节点，因此设置一个指针永远指向头节点
+		ListNode newHead = new ListNode(0);
+		newHead.next = head;
+//		设置扫描指针，不过这里是cur从newhead开始，
+		ListNode cur = newHead;
+//		设置int变量，保存目前比较的值
+		int data = Integer.MAX_VALUE;
+//		pre指针保存上一次已经完全确定没有重复的节点的尾部
+		ListNode pre = newHead;
+		while(cur.next!=null){
+//			若当前data值与cur.next的值不相等
+			if(cur.next.val!=data){
+				data = cur.next.val;
+				pre = cur;
+				cur = cur.next;
+//				若相等则是删除当前cur与cur.next两个节点，同时cur指向pre；
+			}else{
+				pre.next = cur.next.next;
+				cur = pre;
+			}
+		}
+		return newHead.next;
+	}
+	/***！！！！！问题12--------------------合并两个有序的链表，合并后的链表也是有序的---------------------！！
+	 * 
+	 * 
+	 * 实际上，本题就是归并排序的简化版本，对两个链表进行归并
+	 *输入：两个有序的链表list1与list2，输出 ：两个链表合并后返回的链表head
+	 *思路:利用递归的方法就行归并，由于两个链表已经有效了
+	 */
+	public ListNode mergeTwoLists(ListNode list1,ListNode list2){
+		if(list1==null){
+			return list2;
+		}
+		if(list2==null){
+			return list1;
+		}
+		ListNode result =null;
+		if(list1.val<=list2.val){
+			result = list1;
+			result.next = mergeTwoLists(list1.next, list2);
+		}else{
+			result = list2;
+			result.next = mergeTwoLists(list1, list2.next);
+			
+		}
+		return result;
+	}
+	
+	/***！！！！！问题13--------------------将链表的奇数位置的节点按照顺序移动到链表的左边，将链表偶数位置的节点按照顺序移动到链表的右边---------------------！！
+	 * 例如 1->2->3->4->5->6
+	 * 变换后为：1-3->5->2->4->6
+	 * 
+	 * 关键思路：双指针的思路方法
+	 * 输入：链表head， 输出：转换后的链表head
+	 * 
+	 */
+	public ListNode changeToSuchList(ListNode head){
+		if(head==null||head.next==null||head.next.next==null)
+			return head;
+//		设置两个指针，其中一个指针指向奇数位置节点的最后一个节点，一个指针指向下一个要调整位置的奇数节点的前驱节点
+		ListNode tail = head;
+		ListNode pre = head.next;
+		while(pre.next!=null){
+			ListNode temp = pre.next;
+			pre.next = pre.next.next;
+			temp.next = tail.next;
+			tail.next = temp;
+			tail = tail.next;
+			if(pre.next==null){
+				break;
+			}
+			pre = pre.next;
+		}
+		return head;
+		
+	}
+	/***！！！！！问题14---------------------------------------将链表逆转----------------------------------------------!!!!!
+	 * 
+	 * 
+	 * 输入：链表 head，输出链表 head
+	 */
+	public ListNode roatate(ListNode head){
+		if(head==null||head.next==null){
+			return head;
+		}
+//		设置新节点永远指向链表的头部
+		ListNode newHead = new ListNode(0);
+		newHead.next = head;
+//		设置指针进行节点的遍历
+		ListNode cur = head;
+		while(cur.next!=null){
+			ListNode temp = cur.next;
+			cur.next = cur.next.next;
+			temp.next = newHead.next;
+			newHead.next = temp;
+		}
+		return newHead.next;
+	}
+	/***！！！！！问题14---------------------------------------将链表的部分进行旋转转，----------------------------------------------!!!!!
+	*Given 1->2->3->4->5->NULL and k = 2,
+	return 4->5->1->2->3->NULL.
+	*输入；链表head，整型数k，要求把链表尾部的k个节点移动到链表的头部 输出：旋转后的链表 head
+	*/
+	public ListNode rotate2(ListNode head,int k)
+	{
+		if(head==null){
+			return head;
+		}
+//		先看一下链表中节点的个数
+		ListNode cur = head;
+		int num = 0;
+		while(cur!=null){
+			num++;
+			cur = cur.next;
+		}
+//		得到实际链表要逆转的节点个数
+		int n = k%num;
+		ListNode newHead = new ListNode(0);
+		newHead.next = head;
+//		遍历一遍链表，得到最后一个非null节点，以及要逆转的第一个节点的前驱节点
+		ListNode pre = head;
+		ListNode fast = head;
+		while(n>0){
+			fast =fast.next;
+			n--;
+		}
+		while(fast.next!=null){
+			fast= fast.next;
+			pre= pre.next;
+		}
+//		逆转链表
+		fast.next = newHead.next;
+		newHead.next = pre.next;
+		pre.next = null;
+		return newHead.next;
+	}
+
+	
+	/***！！！！！问题15对k个有序的链表进行归并成一个链表---------------------------------------将链表的部分进行旋转转，----------------------------------------------!!!!!
+	 * 关键思路：两两归并，归并排序是链表最好的排序算法，一定要掌握！！！
+	 * 
+	 * 思路1：采取两两归并的思路
+	 * 思路2：建立堆，维护一个小根堆，每次从堆中取出堆顶的元素！！！！利用堆求解
+	 * 输入：k个链表，输出，合并后的链表
+	 */
+	public ListNode mergeKLists(ArrayList<ListNode> lists){
+		int size = lists.size();
+		if(size==0){
+			return null;
+		}
+//		递归进行归并
+		return guiBingLists(lists,0,size-1);
+		
+	}
+
+	private ListNode guiBingLists(ArrayList<ListNode> lists, int start, int end) {
+		// TODO Auto-generated method stub
+		if(start<end){
+			int mid = start+(end-start)/2;
+			ListNode l1 = guiBingLists(lists, start, mid);
+			ListNode l2 = guiBingLists(lists, mid+1, end);
+			return merge2(l1, l2);
+		}
+		return lists.get(start);
+	}
 	
 	
+	public ListNode mergeKLists2(ArrayList<ListNode> lists){
+		int size = lists.size();
+		if(size==0){
+			return null;
+		}
+//		构造head节点永远指向合并后链表的头节点
+		ListNode head = new ListNode(0);
+//		建立一个这些链表的小根堆，在java中优先队列就是由堆来底层实现的
+		PriorityQueue<ListNode> q = new PriorityQueue<>(size, new Comparator<ListNode>(){
+
+			@Override
+			public int compare(ListNode o1, ListNode o2) {
+				// TODO Auto-generated method stub
+				return o1.val-o2.val;
+			}
+			
+		});
+//		将所有的链表加入
+		for(int i=0;i<size;i++){
+			if(lists.get(i)!=null)
+				q.add(lists.get(i));
+		}
+//		然后开始进行构造合并后的链表，每次只需取出堆顶的元素，然后在读取取出节点的下一个节点，然后维护堆继续为一个小根堆，直到堆中没有元素为止
+		ListNode cur = head;
+		while(!q.isEmpty()){
+			ListNode t = q.poll();
+			if(t.next!=null)
+				q.add(t.next);
+			cur.next = t;
+			cur = cur.next;
+		}
+		return head.next;
+	}
 	
 	
+	/***！！！！！问题16 删除链表中的从链表尾部开始的第k个节点----------------------------------------------!!!!!
+	 * 
+	 * 
+	 * 思路：双指针的方法，使两个指针保持k个节点的差距
+	 * 输入：链表head以及int型数字k，输出：删除节点后的链表head
+	 */
 	
+	public ListNode deleteKNode(ListNode head,int k){
+		
+		if(head==null||k==0){
+			return head;
+		}
+//		设置节点，永远指向链表的头节点
+		ListNode newHead = new ListNode(0);
+		newHead.next = head;
+//		设置双指针，两个指针相差k个节点,要删除的节点是slow.next的节点
+		ListNode slow = newHead;
+		ListNode fast = head;
+		int i =1;
+		while(i<k){
+			fast = fast.next;
+			i++;
+		}
+//		此时slow与fast相差k个节点，而且要删除的节点是slow.next节点
+		while(fast.next!=null){
+			slow = slow.next;
+			fast = fast.next;
+		}
+//		删除第k个节点，从后面向前的
+		slow.next=slow.next.next;
+		return newHead.next;
+		
+	}
 	
+	/***！！！！！问题17:交换任意两个相邻节点的位置----------------------------------------------!!!!!
+	 * 例如：Given 1->2->3->4, you should return the list as 2->1->4->3.
+	 * 
+	 * 输入：链表  输出：链表
+	 * 
+	 */
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	public ListNode swapTwoNodes(ListNode head){
+		if(head==null||head.next==null){
+			return head;
+		}
+//		设置一个节点永远指向头节点
+		ListNode newHead = new ListNode(0);
+		newHead.next = head;
+//		设置指针，指向需要变换位置的两个节点的前驱节点
+		ListNode cur = newHead;
+		while(cur.next!=null&&cur.next.next!=null){
+//			进行两个节点的交换
+			ListNode temp = cur.next;
+			cur.next = cur.next.next;
+			temp.next = cur.next.next;
+			cur.next.next = temp;
+			cur = temp;
+		}
+		return newHead.next;
+		
+	}
 }
